@@ -9,7 +9,7 @@ echo "cumulus ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/10_cumulus
 # Create mew metpops user
 adduser netops --disabled-password -gecos "Network Admin User ACcount"
 adduser netops sudo
-echo "netops:ticketmaster123!" | chpasswd
+echo "netops:test123!" | chpasswd
 
 # Genereate ssh keys
 ssh-keygen -f $HOME/.ssh/id_rsa -q -N ""
