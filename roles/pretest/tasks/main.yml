@@ -1,0 +1,29 @@
+---
+
+- name: 1. SWITCH FABRIC CONNECTIVITY CHECK FROM SPINE TO LEAF1/2
+  shell: ping -c 1 -I swp1 '{{ item }}'
+  when: "'spine' in inventory_hostname"
+  with_items:
+    - '10.76.65.67'
+    - '10.76.65.68'
+
+- name: 1. SWITCH FABRIC CONNECTIVITY CHECK FROM SPINE TO LEAF1/2
+  shell: ping -c 1 -I swp2 '{{ item }}'
+  when: "'spine' in inventory_hostname"
+  with_items:
+    - '10.76.65.67'
+    - '10.76.65.68'
+
+- name: 1. SWITCH FABRIC CONNECTIVITY CHECK FROM SPINE TO LEAF1/2
+  shell: ping -c 1 -I swp3 '{{ item }}'
+  when: "'spine' in inventory_hostname"
+  with_items:
+    - '10.76.65.69'
+    - '10.76.65.70'
+
+- name: 1. SWITCH FABRIC CONNECTIVITY CHECK FROM SPINE TO LEAF1/2
+  shell: ping -c 1 -I swp4 '{{ item }}'
+  when: "'spine' in inventory_hostname"
+  with_items:
+    - '10.76.65.69'
+    - '10.76.65.70'

@@ -1,0 +1,13 @@
+---
+- name: VERIFY FRR RUNNING
+  service: name=frr enabled=yes state=started
+
+- name: CONFIGURE FRR DAEMON SETTINGS
+  template: src=templates/daemons dest=/etc/frr/daemons
+  notify: reload frr
+
+#- name: write the FRR config file
+#  template: src=templates/frr.j2 dest=/etc/frr/frr.conf
+#  notify:
+#    - reload frr
+#    - restart netq agent

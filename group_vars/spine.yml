@@ -1,0 +1,19 @@
+---
+
+interfaces:
+  swp1:
+    alias: downlink-leaf-1
+    address: "{{ loopback }}"
+
+  swp2:
+    alias: downlink-leaf-2
+    address: "{{ loopback }}"
+
+  swp3:
+    alias: downlink-leaf-3
+    address: "{{ loopback }}"
+
+  swp4:
+    alias: downlink-leaf-4
+    address: "{{ loopback }}"
+    

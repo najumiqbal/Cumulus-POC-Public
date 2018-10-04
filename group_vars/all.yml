@@ -1,0 +1,32 @@
+---
+
+ntp:
+  - '10.75.32.5'
+  - '10.75.33.5'
+  - '205.132.168.208'
+
+timezone: Europe/Amsterdam
+
+netq-server: 1.1.1.1
+
+clag_pairs:
+  leafgroup1:
+    - lf1
+    - lf2
+  leafgroup2:
+    - lf3
+    - lf4
+
+ptm:
+  - '"lf1":"swp1" -- "sp1":"swp1"'
+  - '"lf2":"swp1" -- "sp1":"swp2"'
+  - '"lf3":"swp1" -- "sp1":"swp3"'
+  - '"lf4":"swp1" -- "sp1":"swp4"'
+  - '"lf1":"swp2" -- "sp2":"swp1"'
+  - '"lf2":"swp2" -- "sp2":"swp2"'
+  - '"lf3":"swp2" -- "sp2":"swp3"'
+  - '"lf4":"swp2" -- "sp2":"swp4"'
+  - '"lf1":"swp15" -- "lf2":"swp15"'
+  - '"lf1":"swp16" -- "lf2":"swp16"'
+  - '"lf3":"swp15" -- "lf4":"swp15"'
+  - '"lf3":"swp16" -- "lf4":"swp16"'

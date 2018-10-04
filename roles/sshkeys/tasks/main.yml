@@ -1,0 +1,15 @@
+---
+
+- name: CREATE ".ssh" DIRECTORY FOR THE CUMULUS USER
+  file: path=/home/cumulus/.ssh state=directory mode=0755
+
+- name: COPY KNOWN AUTHORIZED KEY TO CUMULUS USER
+  copy: src=id_rsa.pub
+        dest=/home/cumulus/.ssh/authorized_keys
+
+- name: CREATE ".ssh" DIRECTORY FOR THE ROOT USER
+  file: path=/root/.ssh state=directory mode=0755
+
+- name: COPY KNOWN AUTHORIZED KEY TO ROOT USER
+  copy: src=id_rsa.pub
+        dest=/root/.ssh/authorized_keys

@@ -1,0 +1,7 @@
+---
+
+- name: CONFIGURE INTERFACE FILE
+  template: src=templates/interfaces.j2
+            dest=/etc/network/interfaces owner=root group=root mode=0644
+  notify: reload networking
+

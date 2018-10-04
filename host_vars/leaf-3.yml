@@ -1,0 +1,77 @@
+---
+
+loopback: 10.75.65.69/32
+
+bgp_fabric:
+  asn: 65087
+  router_id: 10.75.65.69
+  neighbor:
+    - swp1
+    - swp2
+  networks:
+    - 10.75.65.69/32
+    - 10.76.66.0/24
+    - 10.76.67.0/24
+    - 10.76.68.0/24
+    - 10.76.69.0/24
+    - 10.76.70.0/24
+  evpn: true
+  advertise_vni: true
+
+peerlink:
+  bond_slaves: swp15 swp16
+  mtu: 9216
+  vlan: 4002
+  address: 169.254.1.1/30
+  clagd_peer_ip: 169.254.1.2
+  clagd_backup_ip: 192.168.100.8
+  clagd_sys_mac: 44:38:39:FF:40:92
+  clagd_priority: 4096
+
+bridge:
+  ports: peerlink bond0 bond1 vxlan10201
+  vids: 102 201
+
+vlans:
+  66:
+    alias: cloudstack-data-66
+    vipv4: 10.76.66.254/24
+    vmac: 00:00:5e:00:01:01
+    pipv4: 10.76.66.3/24
+  67:
+    alias: cloudstack-storage-67
+    vipv4: 10.76.67.254/24
+    vmac: 00:00:5e:00:01:02
+    pipv4: 10.76.67.3/24
+  68:
+    alias: cloudstack-guest-68
+    vipv4: 10.76.68.254/24
+    vmac: 00:00:5e:00:01:03
+    pipv4: 10.76.68.3/24
+  69:
+    alias: cloudstack-public-69
+    vipv4: 10.76.69.254/24
+    vmac: 00:00:5e:00:01:04
+    pipv4: 10.76.69.3/24
+  70:
+    alias: cloudstack-mgmt-70
+    vipv4: 10.76.70.254/24
+    vmac: 00:00:5e:00:01:05
+    pipv4: 10.76.70.3/24
+
+vxlans:
+  10201:
+    alias: prod-server-10201
+    vxlan_local_tunnelip: 10.255.0.7
+    bridge_access: 201
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+
+interfaces:
+  swp1:
+    alias: uplink-spine-1
+    address: "{{ loopback }}"
+
+  swp2:
+    alias: uplink-spine-2
+    address: "{{ loopback }}"

@@ -1,0 +1,9 @@
+---
+
+- name: COPY LICENSE
+  template: src=templates/license.txt
+            dest=/home/cumulus/license.txt
+
+- name: APPLY LICENSE
+  command:  sudo cl-license -i /home/cumulus/license.txt
+  notify: restart switchd

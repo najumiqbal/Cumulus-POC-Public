@@ -1,0 +1,12 @@
+---
+
+clagd_vxlan_anycast_ip: 10.255.100.1
+
+interfaces:
+  swp51:
+    alias: uplink-spine-1
+    address: "{{ loopback }}"
+
+  swp52:
+    alias: uplink-spine-2
+    address: "{{ loopback }}"

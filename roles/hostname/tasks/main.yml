@@ -1,0 +1,19 @@
+---
+
+- name: CONFIGURE HOSTNAME
+  lineinfile: dest=/etc/hostname
+              regexp='^' backrefs=no
+              line='{{ inventory_hostname }}'
+              state=present
+  notify: apply hostname
+- name: REMOVE CUMULUS HOSTNAME FROM LOCAL HOSTS FILE
+  lineinfile: dest=/etc/hosts
+              regexp='^.*  cumulus' backrefs=no
+              line='127.0.1.1  cumulus'
+              state=absent
+- name: ADD LOCAL DNS RESOLUTION FOR HOSTNAME
+  lineinfile: dest=/etc/hosts
+              regexp='^.*  {{ inventory_hostname }}' backrefs=no
+              line='127.0.1.1       {{ inventory_hostname }}'
+              state=present
+  notify: apply hostname

@@ -1,0 +1,51 @@
+---
+
+- hosts: all
+
+  remote_user: cumulus
+  gather_facts: 'no'
+  become: 'yes'
+  vars:
+    ansible_user: "cumulus"
+    ansible_ssh_pass: "CumulusLinux!"
+    ansible_become_pass: "CumulusLinux!"
+
+  handlers:
+    - name: reload networking
+      command: "{{item}}"
+      with_items:
+        - ifreload -a
+        - sleep 10
+
+    - name: reload frr
+      service: name=frr state=reloaded
+
+    - name: apply hostname
+      command: hostname -F /etc/hostname
+
+    - name: restart netq agent
+      command: netq config agent restart
+
+    - name: reload ptmd
+      service: name=ptmd state=reloaded
+
+    - name: apply timezone
+      command: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
+
+    - name: restart ntp
+      service: name=ntp state=restarted
+
+    - name: restart switchd
+      service: name=switchd state=restarted
+
+  roles:
+    - pretest
+    - sshkeys
+    - configbackup
+    - hostname
+    - interfaces
+    - routing
+    - ptm
+    - license
+    - ntp
+    - netq

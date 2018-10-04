@@ -1,0 +1,28 @@
+---
+
+- name: ADD NETQ RESPOSITORY URL
+  lineinfile: 
+    path: /etc/apt/sources.list
+    line: 'deb http://apps3.cumulusnetworks.com/repos/deb CumulusLinux-3 netq-latest'
+    state: present
+
+- name: INSTALL CUMULUS-NETQ
+  apt: name=cumulus-netq update_cache=yes state=present
+  register: result
+
+- name: RESTART SYSLOG SERVICE
+  service: name=rsyslog state=restarted
+  when: result.stdout is defined
+
+- pause: seconds=5
+
+- name: ADD NETQ SERVER IP DETAIL
+  command: netq add server "{{ netq-server }}" vrf mgmt
+  when: result.stdout is defined
+
+- name: START NETQ-AGENT
+  service: name=netq-agent state=restarted
+  when: result.stdout is defined
+
+- name: RESTART NETQ-AGENT
+  command: netq agent restart

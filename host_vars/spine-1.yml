@@ -1,0 +1,15 @@
+---
+
+loopback: 10.75.65.65/32
+
+bgp_fabric:
+  asn: 65085
+  router_id: 10.75.65.65
+  neighbor:
+    - swp1
+    - swp2
+    - swp3
+    - swp4
+  networks:
+    - 10.75.65.65/32
+  evpn: true
