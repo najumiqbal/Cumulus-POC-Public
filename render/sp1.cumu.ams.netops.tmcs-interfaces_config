@@ -1,0 +1,51 @@
+## File Managed by Ansible ##
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LOOPBACK CONFIGURATION START !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+auto lo
+iface lo inet loopback
+    address 10.75.65.65/32
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LOOPBACK CONFIGURATION END !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!
+!
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! PHYSICAL INTERFACE CONFIGURATION START !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+auto swp2
+iface swp2
+    alias downlink-leaf-2
+    address 10.75.65.65/32
+ 
+auto swp3
+iface swp3
+    alias downlink-leaf-3
+    address 10.75.65.65/32
+ 
+auto swp1
+iface swp1
+    alias downlink-leaf-1
+    address 10.75.65.65/32
+ 
+auto swp4
+iface swp4
+    alias downlink-leaf-4
+    address 10.75.65.65/32
+ 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! PHYSICAL INTERFACE CONFIGURATION END !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!
+!
+!
+!
+!
+
+!
+!

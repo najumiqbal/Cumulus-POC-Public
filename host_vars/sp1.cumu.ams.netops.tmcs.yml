@@ -2,6 +2,8 @@
 
 loopback: 10.75.65.65/32
 
+mgmt: 10.76.35.1/32
+
 bgp_fabric:
   asn: 65085
   router_id: 10.75.65.65

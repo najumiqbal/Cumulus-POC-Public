@@ -1,0 +1,204 @@
+---
+
+loopback: 10.75.65.68/32
+
+mgmt: 10.76.35.4/32
+
+bgp_fabric:
+  asn: 65087
+  router_id: 10.75.65.68
+  neighbor:
+    - swp1
+    - swp2
+    - swp15
+    - swp16
+  networks:
+    - 10.75.65.68/32
+  evpn: true
+  advertise_vni: true
+  vrf:
+    - cs-data
+    - cs-storage
+    - cs-guest
+    - cs-public
+    - cs-mgmt
+
+rmaps:
+  LOOPBACK:
+    10:
+      rule: permit
+      alias: LOOPBACK
+      interface: lo
+    1000:
+      rule: deny
+      alias: LOOPBACK
+  CS-DATA-NETS:
+    10:
+      rule: permit
+      alias: CS-DATA-NETS
+      interface: vlan66
+    1000:
+      rule: deny
+      alias: CS-DATA-NETS
+  CS-STORAGE-NETS:
+    10:
+      rule: permit
+      alias: CS-STORAGE-NETS
+      interface: vlan67
+    1000:
+      rule: deny
+      alias: CS-STORAGE-NETS
+  CS-GUEST-NETS:
+    10:
+      rule: permit
+      alias: CS-GUEST-NETS
+      interface: vlan68
+    1000:
+      rule: deny
+      alias: CS-GUEST-NETS
+  CS-PUBLIC-NETS:
+    10:
+      rule: permit
+      alias: CS-PUBLIC-NETS
+      interface: vlan69
+    1000:
+      rule: deny
+      alias: CS-PUBLIC-NETS
+  CS-MGMT-NETS:
+    10:
+      rule: permit
+      alias: CS-MGMT-NETS
+      interface: vlan70
+    1000:
+      rule: deny
+      alias: CS-MGMT-NETS
+
+peerlink:
+  bond_slaves: swp15 swp16
+  mtu: 9216
+  vlan: 4000
+  address: 169.254.1.2/30
+  clagd_peer_ip: 169.254.1.1
+  clagd_backup_ip: 10.746.35.3
+  clagd_sys_mac: 44:38:39:FF:40:12
+  clagd_priority: 2000
+
+bridge:
+  ports: peerlink vni66 vni67
+  vids: 66 67 68 69 70
+  bridge_vlan_aware: yes
+
+vlans:
+  66:
+    alias: cs-data-66
+    vipv4: 10.76.66.254/24
+    vmac: 00:00:5e:00:01:66
+    pipv4: 10.76.66.253/24
+    vlan_raw_device: bridge
+  67:
+    alias: cs-storage-67
+    vipv4: 10.76.67.254/24
+    vmac: 00:00:5e:00:01:67
+    pipv4: 10.76.67.253/24
+    vlan_raw_device: bridge
+  68:
+    alias: cs-guest-68
+    vipv4: 10.76.68.254/24
+    vmac: 00:00:5e:00:01:68
+    pipv4: 10.76.68.253/24
+    vlan_raw_device: bridge
+  69:
+    alias: cs-public-69
+    vipv4: 10.76.69.254/24
+    vmac: 00:00:5e:00:01:69
+    pipv4: 10.76.69.253/24
+    vlan_raw_device: bridge
+  70:
+    alias: cs-mgmt-70
+    vipv4: 10.76.70.254/24
+    vmac: 00:00:5e:00:01:70
+    pipv4: 10.76.70.253/24
+    vlan_raw_device: bridge
+
+vxlans:
+  66:
+    alias: cs-data-l2-vni-
+    vxlan_local_tunnelip: "{{ loopback }}"
+    ntu: 9000
+    bridge_access: 66
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+    vxlan_id: 10066
+  67:
+    alias: cs-storage-l2-vni-
+    vxlan_local_tunnelip: "{{ loopback }}"
+    ntu: 9000
+    bridge_access: 67
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+    vxlan_id: 10067
+  68:
+    alias: cs-guest-l2-vni-
+    vxlan_local_tunnelip: "{{ loopback }}"
+    ntu: 9000
+    bridge_access: 68
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+    vxlan_id: 10068
+  69:
+    alias: cs-public-l2-vni-
+    vxlan_local_tunnelip: "{{ loopback }}"
+    ntu: 9000
+    bridge_access: 69
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+    vxlan_id: 10069    
+  70:
+    alias: cs-mgmt-l2-vni-
+    vxlan_local_tunnelip: "{{ loopback }}"
+    ntu: 9000
+    bridge_access: 70
+    bridge_learning: 'off'
+    bridge_arp_nd_suppress: 'on'
+    vxlan_id: 10070
+
+interfaces:
+  swp1:
+    alias: uplink-spine-1
+    mtu: 9216
+
+  swp2:
+    alias: uplink-spine-2
+    mtu: 9216
+
+  swp10:
+    alias: link-clag-srv2-e0
+    mtu: 9216
+  
+  swp15:
+    alias: link-lf1
+    mtu: 9216
+
+  swp16:
+    alias: link-lf1
+    mtu: 9216
+
+
+bonds:
+  clag-srv2:
+    alias: link to srv2
+    clag_id: 1
+    bond_slaves: swp10
+    bond_mode: 802.3ad
+    bond_min_links: 1
+    bond_miimon: 100
+    bridge_access: 66
+    mstpctl_portadminedge: 'yes'
+    mstpctl_bpduguard: 'yes'
+
+
+vrf:
+  - cs-data
+  - cs-storage
+
+clagd_vxlan_anycast_ip: 10.76.65.33

@@ -6,6 +6,12 @@
     line: 'deb http://apps3.cumulusnetworks.com/repos/deb CumulusLinux-3 netq-latest'
     state: present
 
+- name: UPDATE AND UPGRADE APT PACKAGES
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+
 - name: INSTALL CUMULUS-NETQ
   apt: name=cumulus-netq update_cache=yes state=present
   register: result
@@ -14,10 +20,10 @@
   service: name=rsyslog state=restarted
   when: result.stdout is defined
 
-- pause: seconds=5
+- pause: seconds=20
 
 - name: ADD NETQ SERVER IP DETAIL
-  command: netq add server "{{ netq-server }}" vrf mgmt
+  command: netq config add server 29.0.5.65 vrf mgmt
   when: result.stdout is defined
 
 - name: START NETQ-AGENT
@@ -25,4 +31,4 @@
   when: result.stdout is defined
 
 - name: RESTART NETQ-AGENT
-  command: netq agent restart
+  command: netq config restart agent

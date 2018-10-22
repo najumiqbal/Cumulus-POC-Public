@@ -9,9 +9,9 @@
   fetch: dest=backup/"{{ lookup('pipe', 'date +%d%m%Y') }}"/{{inventory_hostname}}-"{{ lookup('pipe', 'date +%d%m%Y-%H-%M') }}"/interfaces
          src=/etc/network/interfaces flat=yes
 
-- name: BACKUP INTERFACES_CONFIG FILE
-  fetch: dest=backup/{{inventory_hostname}}/interfaces_config
-         src=/etc/network/interfaces.d/interfaces_config flat=yes
+#- name: BACKUP INTERFACES_CONFIG FILE
+#  fetch: dest=backup/{{inventory_hostname}}/interfaces_config
+#         src=/etc/network/interfaces.d/interfaces_config flat=yes
 
 - name: BACKUP FRR DAEMONS FILE
   fetch: dest=backup/"{{ lookup('pipe', 'date +%d%m%Y') }}"/{{inventory_hostname}}-"{{ lookup('pipe', 'date +%d%m%Y-%H-%M') }}"/daemons

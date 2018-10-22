@@ -10,12 +10,26 @@ log syslog
 {% if bgp_fabric is defined %}
 {% if bgp_fabric.neighbor is defined %}
 {% for item in bgp_fabric.neighbor %}
+{% if loop.first %}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ROUTING INTERFACE START !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{% endif %}
 interface {{ item }}
  ipv6 nd ra-interval 10
  no ipv6 nd suppress-ra
 !
+{% if loop.last %}
+!!!!!!!!!!!!!!!!!!!!!!!!!
+! ROUTING INTERFACE END !
+!!!!!!!!!!!!!!!!!!!!!!!!!
+{% endif %}
 {% endfor %}
 {% endif %}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! BGP CONFIGURATION START !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
 router bgp {{ bgp_fabric.asn }}
  bgp router-id {{ bgp_fabric.router_id }}
  bgp bestpath as-path multipath-relax
@@ -31,15 +45,11 @@ router bgp {{ bgp_fabric.asn }}
  !
  address-family ipv4 unicast
 {% for item in bgp_fabric.networks %}
-  network {{ item }}
+  redistribute connected route-map LOOPBACK
 {% endfor %}
  exit-address-family
  !
 {% if bgp_fabric.evpn is defined %}
- address-family ipv6 unicast
-  neighbor fabric activate
- exit-address-family
- !
  address-family l2vpn evpn
   neighbor fabric activate
 {% if bgp_fabric.advertise_vni is defined %}
@@ -47,7 +57,46 @@ router bgp {{ bgp_fabric.asn }}
 {% endif %}
  exit-address-family
 {% endif %}
+!
+{% if vrf is defined %}
+{% for item in bgp_fabric.vrf %}
+router bgp {{ bgp_fabric.asn }} vrf {{ item }}
+ address-family ipv4 unicast
+{% for item in bgp_fabric.vrf %}
+ import vrf {{ item}}
+{% endfor %}
+ redistribute connected route-map {{ item|upper }}-NETS  
+ exit-address-family
+{% endfor %}
 {% endif %}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! BGP CONFIGURATION END !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{% endif %}
+!
+!
+{% if rmaps is defined %}
+{% for name,rmap in rmaps|dictsort %}
+{% if loop.first %}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ROUTE-MAP CONFIGURATION START !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{% endif %}
+{% for name,rmap_id in rmap.items()|sort %}
+route-map {{rmap_id.alias}} {{rmap_id.rule}} {{name}}
+{% if rmap_id.interface is defined %}
+ match interface {{rmap_id.interface}}
+{% endif %}
+{% endfor %}
+!
+{% if loop.last %}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ROUTE-MAP CONFIGURATION END !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{% endif %}
+{% endfor %}
+{% endif %}
+!
 !
 line vty
 !

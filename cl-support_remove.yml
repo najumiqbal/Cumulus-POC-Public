@@ -1,0 +1,40 @@
+---
+
+- hosts: network
+  remote_user: cumulus
+  gather_facts: 'no'
+  become: 'yes'
+
+  vars:
+    ansible_become_pass: "CumulusLinux!"
+
+  vars_prompt:
+    - name: "are_you_sure"
+      prompt: "Are you REALLY sure you want to delete the files?"
+      default: "no"
+      private: 'no'
+
+  tasks:
+    - debug: msg="{{ are_you_sure }}"
+
+    - debug: msg="Waiting 10 Seconds to make sure that you're really sure..."
+      failed_when: "'yes' not in are_you_sure"
+
+    - wait_for: timeout=10
+
+    - name: 'collect cl-support files'
+      find:
+        paths: "/var/support"
+        hidden: 'True'
+        recurse: 'False'
+        file_type: file
+      register: collected_files
+
+    - name: remove collected cl-support files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: >
+        {{
+        collected_files.files
+        }}

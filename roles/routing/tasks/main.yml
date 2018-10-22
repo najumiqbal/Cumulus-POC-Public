@@ -6,8 +6,11 @@
   template: src=templates/daemons dest=/etc/frr/daemons
   notify: reload frr
 
-#- name: write the FRR config file
-#  template: src=templates/frr.j2 dest=/etc/frr/frr.conf
-#  notify:
-#    - reload frr
-#    - restart netq agent
+- name: REDBER INTERFACEACES.D CONFIGURATION
+  local_action: template src="roles/routing/templates/frr.j2" dest="render/{{ inventory_hostname }}-frr_config" owner=root group=root mode=0644
+
+- name: write the FRR config file
+  template: src=templates/frr.j2 dest=/etc/frr/frr.conf
+  notify:
+    - reload frr
+    - restart netq agent

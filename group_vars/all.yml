@@ -7,7 +7,7 @@ ntp:
 
 timezone: Europe/Amsterdam
 
-netq-server: 1.1.1.1
+netq-server: 29.0.5.65
 
 clag_pairs:
   leafgroup1:
