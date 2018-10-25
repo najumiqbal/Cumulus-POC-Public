@@ -6,11 +6,11 @@
     line: 'deb http://apps3.cumulusnetworks.com/repos/deb CumulusLinux-3 netq-latest'
     state: present
 
-- name: UPDATE AND UPGRADE APT PACKAGES
-  become: true
-  apt:
-    upgrade: yes
-    update_cache: yes
+#- name: UPDATE AND UPGRADE APT PACKAGES
+#  become: true
+#  apt:
+#    upgrade: yes
+#    update_cache: yes
 
 - name: INSTALL CUMULUS-NETQ
   apt: name=cumulus-netq update_cache=yes state=present

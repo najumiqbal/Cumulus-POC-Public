@@ -1,4 +1,4 @@
----
+#---
 
 - hosts: all
 
@@ -39,13 +39,14 @@
       service: name=switchd state=restarted
 
   roles:
-#    - pretest
-#    - sshkeys
-#    - configbackup
-#    - hostname
+    - pretest
+    - sshkeys
+    - configbackup
+    - ptm
+    - hostname
     - interfaces
     - routing
-#    - ptm
-#    - license
-#    - ntp
-#    - netq
+    - license
+    - ntp
+    - netq
+    - netqchecks

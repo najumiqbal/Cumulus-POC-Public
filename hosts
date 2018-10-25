@@ -28,6 +28,5 @@ leaf-3
 leaf-4
 
 #server]
-#server01
-#server02
-#server03
+#srv1.cumu.ams.netops.tmcs ansible_host=10.76.35.7 ansible_hostname=srv1.cumu.ams.netops.tmcs
+#srv2.cumu.ams.netops.tmcs ansible_host=10.76.35.8 ansible_hostname=srv2.cumu.ams.netops.tmcs

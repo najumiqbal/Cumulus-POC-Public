@@ -2,7 +2,7 @@
 
 loopback: 10.75.65.69/32
 
-mgmt: 10.76.35.5/32
+mgmt: 10.76.35.5/23
 
 bgp_fabric:
   asn: 65088
@@ -10,8 +10,7 @@ bgp_fabric:
   neighbor:
     - swp1
     - swp2
-    - swp15
-    - swp16
+    - peerlink.4094
   networks:
     - 10.75.65.69/32
   evpn: true
@@ -76,7 +75,7 @@ rmaps:
 peerlink:
   bond_slaves: swp15 swp16
   mtu: 9216
-  vlan: 4002
+  vlan: 4094
   address: 169.254.1.1/30
   clagd_peer_ip: 169.254.1.2
   clagd_backup_ip: 10.76.35.6
@@ -84,8 +83,8 @@ peerlink:
   clagd_priority: 1000
 
 bridge:
-  ports: peerlink vni66 vni67
-  vids: 66 67 68 69 70
+  ports: peerlink vni66 vni67 vni68 vni69 vni70 vni4001 vni4002 vni4003 vni4004 vni4005 clag-srv2
+  vids: 66 67 68 69 70 4001 4002 4003 4004 4005
   bridge_vlan_aware: yes
 
 vlans:
@@ -95,30 +94,45 @@ vlans:
     vmac: 00:00:5e:00:01:66
     pipv4: 10.76.66.252/24
     vlan_raw_device: bridge
+    vrf: cs-data
+    l3_vni_id: 4001
+    mtu: 9000
   67:
     alias: cs-storage-67
     vipv4: 10.76.67.254/24
     vmac: 00:00:5e:00:01:67
     pipv4: 10.76.67.252/24
     vlan_raw_device: bridge
+    vrf: cs-storage
+    l3_vni_id: 4002
+    mtu: 9000
   68:
     alias: cs-guest-68
     vipv4: 10.76.68.254/24
     vmac: 00:00:5e:00:01:68
     pipv4: 10.76.68.252/24
     vlan_raw_device: bridge
+    vrf: cs-guest
+    l3_vni_id: 4003
+    mtu: 9000
   69:
     alias: cs-public-69
     vipv4: 10.76.69.254/24
     vmac: 00:00:5e:00:01:69
     pipv4: 10.76.69.252/24
     vlan_raw_device: bridge
+    vrf: cs-public
+    l3_vni_id: 4004
+    mtu: 9000
   70:
     alias: cs-mgmt-70
     vipv4: 10.76.70.254/24
     vmac: 00:00:5e:00:01:70
     pipv4: 10.76.70.252/24
     vlan_raw_device: bridge
+    vrf: cs-mgmt
+    l3_vni_id: 4005
+    mtu: 9000
 
 vxlans:
   66:
@@ -129,6 +143,7 @@ vxlans:
     bridge_learning: 'off'
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10066
+    l3_vni_id: 4001
   67:
     alias: cs-storage-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -137,6 +152,7 @@ vxlans:
     bridge_learning: 'off'
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10067
+    l3_vni_id: 4002
   68:
     alias: cs-guest-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -145,6 +161,7 @@ vxlans:
     bridge_learning: 'off'
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10068
+    l3_vni_id: 4003
   69:
     alias: cs-public-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -152,7 +169,8 @@ vxlans:
     bridge_access: 69
     bridge_learning: 'off'
     bridge_arp_nd_suppress: 'on'
-    vxlan_id: 10069    
+    vxlan_id: 10069
+    l3_vni_id: 4004
   70:
     alias: cs-mgmt-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -161,6 +179,7 @@ vxlans:
     bridge_learning: 'off'
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10070
+    l3_vni_id: 4005
 
 interfaces:
   swp1:
@@ -171,9 +190,10 @@ interfaces:
     alias: uplink-spine-2
     mtu: 9216
 
-  swp10:
-    alias: link-clag-srv2-e0
+  swp10s0:
+    alias: link-srv2.cumu.ams-e0
     mtu: 9216
+    link_speed: 10000
   
   swp15:
     alias: link-lf4
@@ -186,18 +206,22 @@ interfaces:
 bonds:
   clag-srv2:
     alias: link to srv2
-    clag_id: 1
-    bond_slaves: swp10
+    clag_id: 2
+    bond_slaves: swp10s0
     bond_mode: 802.3ad
     bond_min_links: 1
     bond_miimon: 100
-    bridge_access: 66
+    bridge_access: 67
     mstpctl_portadminedge: 'yes'
     mstpctl_bpduguard: 'yes'
+
 
 
 vrf:
   - cs-data
   - cs-storage
+  - cs-guest
+  - cs-public
+  - cs-mgmt
 
 clagd_vxlan_anycast_ip: 10.76.65.34

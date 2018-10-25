@@ -1,0 +1,9 @@
+---
+
+- include_tasks: netq_check_bgp.yml
+  register: netq_check_bgp_output
+  tags: netq_check_bgp
+
+- include_tasks: netq_check_clag.yml
+  register: netq_check_clag_output
+  tags: netq_check_clag

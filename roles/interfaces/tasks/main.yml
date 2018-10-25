@@ -1,18 +1,17 @@
 ---
 
 - name: RENDER INTERFACES CONFIGURATION
-  local_action: template src="roles/interfaces/templates/interfaces.j2" dest="render/{{ inventory_hostname }}-interfaces.cfg" owner=root group=root mode=0644
-
-- name: REDBER INTERFACEACES.D CONFIGURATION
-  local_action: template src="roles/interfaces/templates/interfaces_config.j2" dest="render/{{ inventory_hostname }}-interfaces_config" owner=root group=root mode=0644
-
+  local_action: template src="roles/interfaces/templates/interfaces.j2" dest="render/{{ inventory_hostname }}-interfaces.cfg"
 
 - name: CONFIGURE INTERFACE FILE
   template: src=templates/interfaces.j2
             dest=/etc/network/interfaces owner=root group=root mode=0644
   notify: reload networking
 
-- name: CONFIGURE INTERFACES (BOND/BRIDGES/SVI)
-  template: src=templates/interfaces_config.j2
-            dest=/etc/network/interfaces.d/interfaces_config
-  notify: reload networking
+#- name: REDBER INTERFACEACES.D CONFIGURATION
+#  local_action: template src="roles/interfaces/templates/interfaces_config.j2" dest="render/{{ inventory_hostname }}-interfaces_config"
+
+#- name: CONFIGURE INTERFACES (BOND/BRIDGES/SVI)
+#  template: src=templates/interfaces_config.j2
+#            dest=/etc/network/interfaces.d/interfaces_config
+#  notify: reload networking

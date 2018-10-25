@@ -1,43 +1,53 @@
 ## File Managed by Ansible ##
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! LOOPBACK CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+################################
+# LOOPBACK CONFIGURATION START #
+################################
 auto lo
 iface lo inet loopback
     address 10.75.65.67/32
     clagd-vxlan-anycast-ip 10.76.65.33
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! LOOPBACK CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VRF CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
+##############################
+# LOOPBACK CONFIGURATION END #
+##############################
+
+
+###########################
+# VRF CONFIGURATION START #
+###########################
 auto cs-data
 iface cs-data
     vrf-table auto
 auto cs-storage
 iface cs-storage
     vrf-table auto
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VRF CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PHYSICAL INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+auto cs-guest
+iface cs-guest
+    vrf-table auto
+auto cs-public
+iface cs-public
+    vrf-table auto
+auto cs-mgmt
+iface cs-mgmt
+    vrf-table auto
+#########################
+# VRF CONFIGURATION END #
+#########################
+
+
+##########################################
+# PHYSICAL INTERFACE CONFIGURATION START #
+##########################################
 auto swp2
 iface swp2
     alias uplink-spine-2
     mtu 9216
  
-auto swp10
-iface swp10
-    alias link-clag-srv2-e0
+auto swp10s0
+iface swp10s0
+    alias link-srv1.cumu.ams-e0
+    link-speed 10000
     mtu 9216
  
 auto swp1
@@ -55,33 +65,44 @@ iface swp16
     alias link-lf2
     mtu 9216
  
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PHYSICAL INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BOND INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+########################################
+# PHYSICAL INTERFACE CONFIGURATION END #
+########################################
+
+
+######################################
+# BOND INTERFACE CONFIGURATION START #
+######################################
 auto clag-srv2
 iface clag-srv2
     alias link to srv2
-    clag-id 1
-    bridge-access 66
-    bond-slaves swp10
+    clag-id 2
+    bridge-access 67
+    bond-slaves swp10s1
     bond-mode 802.3ad
     bond-min-links 1
     bond-miimon 100
-    mstpct-portadminedge yes
+    mstpctl-portadminedge yes
     mstpctl-bpduguard yes
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BOND INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PEERLINK INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+auto clag-srv1
+iface clag-srv1
+    alias link to srv1
+    clag-id 1
+    bridge-access 66
+    bond-slaves swp10s0
+    bond-mode 802.3ad
+    bond-min-links 1
+    bond-miimon 100
+    mstpctl-portadminedge yes
+    mstpctl-bpduguard yes
+####################################
+# BOND INTERFACE CONFIGURATION END #
+####################################
+
+
+##########################################
+# PEERLINK INTERFACE CONFIGURATION START #
+##########################################
 auto peerlink
 iface peerlink
     bond-slaves swp15 swp16
@@ -91,75 +112,80 @@ auto peerlink.4094
 iface peerlink.4094
     address 169.254.1.1/30
     clagd-peer-ip 169.254.1.2
-    clagd-backup-ip 10.76.35.4
-    clagd-sys-mac 44:39:39:ff:40:12
+    clagd-backup-ip 10.76.35.4 vrf mgmt
+    clagd-sys-mac 44:38:39:ff:40:12
     clagd-enable yes
     clagd-priority 1000
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PEERLINK INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BRIDGE INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+########################################
+# PEERLINK INTERFACE CONFIGURATION END #
+########################################
+
+
+########################################
+# BRIDGE INTERFACE CONFIGURATION START #
+########################################
 auto bridge
 iface bridge
     bridge-vlan-aware yes
-    bridge-ports peerlink vni66 vni67
+    bridge-ports peerlink vni66 vni67 vni68 vni69 vni70 clag-srv1 clag-srv2
     bridge-vids 66 67 68 69 70
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BRIDGE INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# BRIDGE INTERFACE CONFIGURATION END #
+######################################
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-auto vlan66
-interface vlan66
+######################################
+# VLAN INTERFACE CONFIGURATION START #
+######################################
+iface vlan66
     alias cs-data-66
+    vrf cs-data
     address 10.76.66.252/24
     address-virtual 00:00:5e:00:01:66 10.76.66.254/24
     vlan-raw-device bridge
+    vrf cs-data
     vlan-id 66
-auto vlan67
-interface vlan67
+iface vlan67
     alias cs-storage-67
+    vrf cs-storage
     address 10.76.67.252/24
     address-virtual 00:00:5e:00:01:67 10.76.67.254/24
     vlan-raw-device bridge
+    vrf cs-storage
     vlan-id 67
-auto vlan68
-interface vlan68
+iface vlan68
     alias cs-guest-68
+    vrf cs-guest
     address 10.76.68.252/24
     address-virtual 00:00:5e:00:01:68 10.76.68.254/24
     vlan-raw-device bridge
+    vrf cs-guest
     vlan-id 68
-auto vlan69
-interface vlan69
+iface vlan69
     alias cs-public-69
+    vrf cs-public
     address 10.76.69.252/24
     address-virtual 00:00:5e:00:01:69 10.76.69.254/24
     vlan-raw-device bridge
+    vrf cs-public
     vlan-id 69
-auto vlan70
-interface vlan70
+iface vlan70
     alias cs-mgmt-70
+    vrf cs-mgmt
     address 10.76.70.252/24
     address-virtual 00:00:5e:00:01:70 10.76.70.254/24
     vlan-raw-device bridge
+    vrf cs-mgmt
     vlan-id 70
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VXLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# VLAN INTERFACE CONFIGURATION START #
+######################################
+
+
+#######################################
+# VXLAN INTERFACE CONFIGURATION START #
+#######################################
 auto vni66
-interface vni66
+iface vni66
     alias cs-data-l2-vni-10066
     vxlan-id 10066
     vxlan-local-tunnelip 10.75.65.67
@@ -169,7 +195,7 @@ interface vni66
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 auto vni67
-interface vni67
+iface vni67
     alias cs-storage-l2-vni-10067
     vxlan-id 10067
     vxlan-local-tunnelip 10.75.65.67
@@ -179,7 +205,7 @@ interface vni67
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 auto vni68
-interface vni68
+iface vni68
     alias cs-guest-l2-vni-10068
     vxlan-id 10068
     vxlan-local-tunnelip 10.75.65.67
@@ -189,7 +215,7 @@ interface vni68
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 auto vni69
-interface vni69
+iface vni69
     alias cs-public-l2-vni-10069
     vxlan-id 10069
     vxlan-local-tunnelip 10.75.65.67
@@ -199,7 +225,7 @@ interface vni69
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 auto vni70
-interface vni70
+iface vni70
     alias cs-mgmt-l2-vni-10070
     vxlan-id 10070
     vxlan-local-tunnelip 10.75.65.67
@@ -208,6 +234,6 @@ interface vni70
     bridge-arp-nd-suppress on
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VXLAN INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#####################################
+# VXLAN INTERFACE CONFIGURATION END #
+#####################################

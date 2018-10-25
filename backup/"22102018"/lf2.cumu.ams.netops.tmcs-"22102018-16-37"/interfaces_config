@@ -1,0 +1,129 @@
+auto lo
+iface lo inet loopback
+    # The primary network interface
+    address 10.76.65.68/32
+    clagd-vxlan-anycast-ip 10.76.65.33
+#pre-up sysctl -w net.ipv4.neigh.default.gc_thresh1=0
+#pre-up sysctl -w net.ipv4.route.gc_timeout=60
+#pre-up sysctl -w net.ipv4.neigh.default.base_reachable_time_ms=240000
+
+auto eth0
+iface eth0
+    address 10.76.35.4/23
+    gateway 10.76.34.1
+    vrf mgmt
+
+auto mgmt
+iface mgmt
+    address 127.0.0.1/8
+    vrf-table auto
+
+auto swp1
+iface swp1
+    mtu 9216
+    alias Uplink to sp1
+
+auto swp2
+iface swp2
+    mtu 9216
+    alias Uplink to sp2
+
+auto swp15
+iface swp15
+    mtu 9216
+    alias Uplink to lf2
+
+auto swp16
+iface swp16
+    mtu 9216
+    alias Uplink to lf2
+
+auto peerlink
+iface peerlink
+    bond-slaves swp15 swp16
+
+auto peerlink.4094
+iface peerlink.4094
+    address 169.254.0.2/30
+    clagd-backup-ip 10.76.35.3 vrf mgmt
+    clagd-peer-ip 169.254.0.1
+    clagd-priority 2000
+    clagd-sys-mac 44:39:39:ff:40:00
+
+auto vni66
+iface vni66
+    mtu 9000
+    vxlan-id 10066
+    vxlan-local-tunnelip 10.76.65.68
+    bridge-learning off
+    bridge-access 66
+    bridge-arp-nd-suppress on
+
+auto vni67
+iface vni67
+    mtu 9000
+    vxlan-id 10067
+    vxlan-local-tunnelip 10.76.65.68
+    bridge-learning off
+    bridge-access 67
+    bridge-arp-nd-suppress on
+
+auto vni4001
+iface vni4001
+    mtu 9000
+    vxlan-id 104001
+    vxlan-local-tunnelip 10.76.65.68
+    bridge-learning off
+    bridge-access 4001
+
+auto vni4002
+iface vni4002
+    mtu 9000
+    vxlan-id 104002
+    vxlan-local-tunnelip 10.76.65.68
+    bridge-learning off
+    bridge-access 4002
+
+auto bridge
+iface bridge
+    bridge-vlan-aware yes
+    bridge-ports vni66 vni67 vni4001 vni4002 peerlink
+    bridge-stp on
+    bridge-vids 66 67 4001 4002
+
+auto cs-data
+iface cs-data
+    vrf-table auto
+
+auto cs-storage
+iface cs-storage
+    vrf-table auto
+
+auto vlan66
+iface vlan66
+    address 10.76.66.251/24
+    vlan-id 66
+    vlan-raw-device bridge
+    address-virtual 00:00:5e:00:01:66 10.76.66.254/24
+    vrf cs-data
+
+auto vlan67
+iface vlan67
+    address 10.76.67.251/24
+    vlan-id 67
+    vlan-raw-device bridge
+    address-virtual 00:00:5e:00:01:67 10.76.67.254/24
+    vrf cs-storage
+
+auto vlan4001
+iface vlan4001
+    vlan-id 4001
+    vlan-raw-device bridge
+    vrf cs-data
+
+auto vlan4002
+iface vlan4002
+    vlan-id 4002
+    vlan-raw-device bridge
+    vrf cs-storage
+

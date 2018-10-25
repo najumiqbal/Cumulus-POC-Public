@@ -1,16 +1,9 @@
 ## File Managed by Ansible ##
 
-# This file describes the network interfaces available on your system
-# and how to activate them. For more information, see interfaces(5).
-
-source /etc/network/interfaces.d/*
-
-# The loopback network interface
-auto lo
-iface lo inet loopback
-
-
 {% if mgmt is defined %}
+############################
+# MGMT CONFIGURATION START #
+############################
 auto eth0
 iface eth0
     address {{ mgmt }}
@@ -22,15 +15,306 @@ auto mgmt
 iface mgmt
     address 127.0.0.1/8
     vrf-table auto
+##########################
+# MGMT CONFIGURATION END #
+##########################
 
-auto swp1
-iface swp1
+{% if loopback is defined %}
+################################
+# LOOPBACK CONFIGURATION START #
+################################
+auto lo
+iface lo inet loopback
+    address {{ loopback }}
+{% if clagd_vxlan_anycast_ip is defined %}
+    clagd-vxlan-anycast-ip {{ clagd_vxlan_anycast_ip }}
+{% endif %}
+##############################
+# LOOPBACK CONFIGURATION END #
+##############################
+{% endif %}
 
-auto swp2
-iface swp2
 
-auto swp3
-iface swp3
+{% if vrf is defined %}
+{% for item in vrf %}
+{% if loop.first %}
+###########################
+# VRF CONFIGURATION START #
+###########################
+{% endif %}
+auto {{ item }}
+iface {{ item }}
+    vrf-table auto
+{% if loop.last %}
+#########################
+# VRF CONFIGURATION END #
+#########################
+{% endif %}
+{% endfor %}
+{% endif %}
 
-auto swp4
-iface swp4
+
+{% if interfaces is defined %}
+{% for port, value in interfaces.items() %}
+{% if loop.first %}
+##########################################
+# PHYSICAL INTERFACE CONFIGURATION START #
+##########################################
+{% endif %}
+auto {{ port }}
+iface {{ port }}
+{% if 'alias' in value %}
+    alias {{ value.alias }}
+{% endif %}
+{% if value and 'link_speed' in value %}
+    link-speed {{ value['link_speed'] }}
+{% endif %}
+{% if value and 'link_duplex' in value %}
+    link-duplex {{ value['link_duplex']|ternary('full', 'half') }}
+{% endif %}
+{% if value and 'mtu' in value %}
+    mtu {{ value.mtu }}
+{% endif %}
+{% if value and 'bridge_access' in value  %}
+    bridge-access {{ value.bridge_access }}
+{% endif %}
+{% if value and 'bridge_vids' in value  %}
+    bridge-vids {{ value['bridge_vids'] }}
+{% endif %}
+{% if value and 'bridge_pvid' in value  %}
+    bridge-pvid {{ value.bridge_pvid }}
+{% endif %}
+{% if value and 'address' in value %}
+    address {{ value.address }}
+{% endif %}
+{% if value and 'vrf' in value %}
+    vrf {{ value.vrf }}
+{% endif %}
+{% if value and 'bpduguard' in value %}
+    mstpctl-bpduguard {{ bpduguard }}
+{% endif %}
+{% if value and 'edgeport' in value %}
+    mstpctl-portadminedge {{ edgeport }}
+{% endif %}
+{% if value and 'bridge_assurance' in value %}
+    mstpctl-portnetwork {{ bridge_assurance }}
+{% endif %} 
+{% if loop.last %}
+########################################
+# PHYSICAL INTERFACE CONFIGURATION END #
+########################################
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if bonds is defined %}
+{% for port, value in bonds.items() %}
+{% if loop.first %}
+######################################
+# BOND INTERFACE CONFIGURATION START #
+######################################
+{% endif %}
+auto {{ port }}
+iface {{ port }}
+{% if 'alias' in value %}
+    alias {{ value.alias }}
+{% endif %}
+{% if value.lacp_bypass_allow is defined %}
+    bond-lacp-bypass-allow 1
+{% endif %}
+{% if value.clag_id is defined %}
+    clag-id {{ value.clag_id }}
+{% endif %}
+{% if value and 'bridge_access' in value  %}
+    bridge-access {{ value.bridge_access }}
+{% endif %}
+{% if value and 'bridge_vids' in value  %}
+    bridge-vids {{ value['bridge_vids'] }}
+{% endif %}
+{% if value and 'bridge_pvid' in value  %}
+    bridge-pvid {{ value.bridge_pvid }}
+{% endif %}
+{% if value and 'bond_slaves' in value  %}
+    bond-slaves {{ value.bond_slaves }}
+{% endif %}
+{% if value and 'bond_mode' in value  %}
+    bond-mode {{ value.bond_mode }}
+{% endif %}
+{% if value and 'bond_min_links' in value  %}
+    bond-min-links {{ value.bond_min_links }}
+{% endif %}
+{% if value and 'bond_miimon' in value  %}
+    bond-miimon {{ value.bond_miimon }}
+{% endif %}
+{% if value and 'mstpctl_portadminedge' in value  %}
+    mstpctl-portadminedge {{ value.mstpctl_portadminedge }}
+{% endif %}
+{% if value and 'mstpctl_bpduguard' in value  %}
+    mstpctl-bpduguard {{ value.mstpctl_bpduguard }}
+{% endif %}
+{% if value and 'bridge_assurance' in value %}
+    mstpctl-portnetwork {{ value.bridge_assurance }}
+{% endif %}
+{% if loop.last %}
+####################################
+# BOND INTERFACE CONFIGURATION END #
+####################################
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if peerlink is defined %}
+##########################################
+# PEERLINK INTERFACE CONFIGURATION START #
+##########################################
+auto peerlink
+iface peerlink
+    bond-slaves {{ peerlink.bond_slaves }}
+    mtu {{ peerlink.mtu }}
+
+auto peerlink.{{ peerlink.vlan }}
+iface peerlink.{{ peerlink.vlan }}
+    address {{ peerlink.address }}
+    clagd-peer-ip {{ peerlink.clagd_peer_ip }}
+    clagd-backup-ip {{ peerlink.clagd_backup_ip }} vrf mgmt
+    clagd-sys-mac {{ peerlink.clagd_sys_mac }}
+    clagd-enable yes
+    clagd-priority {{ peerlink.clagd_priority }}
+########################################
+# PEERLINK INTERFACE CONFIGURATION END #
+########################################
+{% endif %}
+
+
+{% if bridge is defined %}
+########################################
+# BRIDGE INTERFACE CONFIGURATION START #
+########################################
+auto bridge
+iface bridge
+    bridge-vlan-aware yes
+    bridge-ports {{ bridge.ports }}
+    bridge-vids {{ bridge.vids }}
+{% if bridge_vlan_aware is defined %}
+    bridge-vlan-aware {{ bridge_vlan_aware }}
+{% endif %}
+######################################
+# BRIDGE INTERFACE CONFIGURATION END #
+######################################
+{% endif %}
+
+{% if vlans is defined %}
+{% for vlan_id, value in vlans.items() %}
+{% if loop.first %}
+######################################
+# VLAN INTERFACE CONFIGURATION START #
+######################################
+{% endif %}
+auto vlan{{ vlan_id }}
+iface vlan{{ vlan_id }}
+    alias {{ value.alias }}
+{% if value and 'vrf' in value %}
+    vrf {{ value.vrf }}
+{% endif %}
+    address {{ value.pipv4 }}
+    address-virtual {{ value.vmac }} {{ value.vipv4 }}
+{% if value and 'vlan_raw_device' in value %}
+    vlan-raw-device {{ value.vlan_raw_device }}
+{% endif %}
+{% if value and 'vrf' in value %}
+    vrf {{ value.vrf }}
+{% endif %}
+    vlan-id {{ vlan_id }}
+{% if loop.last %}
+####################################
+# VLAN INTERFACE CONFIGURATION END #
+####################################
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if vlans is defined %}
+{% for vlan_id, value in vlans.items() %}
+{% if loop.first %}
+#################################################
+# VLAN FOR L3 VNI INTERFACE CONFIGURATION START #
+#################################################
+{% endif %}
+auto vlan{{ value.l3_vni_id }}
+iface vlan{{ value.l3_vni_id }}
+    alias {{ value.alias }}-l3vni-10{{ value.l3_vni_id }}
+    hwaddress {{ value.vmac }}
+{% if value and 'vlan_raw_device' in value %}
+    vlan-raw-device {{ value.vlan_raw_device }}
+{% endif %}
+{% if value and 'vrf' in value %}
+    vrf {{ value.vrf }}
+{% endif %}
+    vlan-id {{ value.l3_vni_id }}
+{% if loop.last %}
+###############################################
+# VLAN FOR L3 VNI INTERFACE CONFIGURATION END #
+###############################################
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if vxlans is defined %}
+{% for vni_id, value in vxlans.items() %}
+{% if loop.first %}
+#######################################
+# VXLAN INTERFACE CONFIGURATION START #
+#######################################
+{% endif %}
+auto vni{{ vni_id }}
+iface vni{{ vni_id }}
+    alias {{ value.alias }}{{ value.vxlan_id}}
+    vxlan-id {{ value.vxlan_id }}
+    vxlan-local-tunnelip {{ value.vxlan_local_tunnelip|replace("/32", "") }}
+    bridge-access {{ value.bridge_access }}
+    bridge-learning {{ value.bridge_learning }}
+    bridge-arp-nd-suppress {{ value.bridge_arp_nd_suppress }}
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+{% if value and 'mtu' in value %}
+    mtu {{ value.mtu }}
+{% endif %}
+{% if loop.last %}
+#####################################
+# VXLAN INTERFACE CONFIGURATION END #
+#####################################
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if vxlans is defined %}
+{% for vni_id, value in vxlans.items() %}
+{% if loop.first %}
+########################################
+# L3 VNI INTERFACE CONFIGURATION START #
+########################################
+{% endif %}
+auto vni{{ value.l3_vni_id }}
+iface vni{{ value.l3_vni_id }}
+    alias {{ value.alias|replace("l2-vni-", "l3-vni10") }}{{ value.l3_vni_id}}
+    vxlan-id 10{{ value.l3_vni_id }}
+    vxlan-local-tunnelip {{ value.vxlan_local_tunnelip|replace("/32", "") }}
+    bridge-access {{ value.l3_vni_id }}
+    bridge-learning {{ value.bridge_learning }}
+    bridge-arp-nd-suppress {{ value.bridge_arp_nd_suppress }}
+    mstpctl-bpduguard yes
+    mstpctl-portbpdufilter yes
+{% if value and 'mtu' in value %}
+    mtu {{ value.mtu }}
+{% endif %}
+{% if loop.last %}
+######################################
+# L3 VNI INTERFACE CONFIGURATION END #
+######################################
+{% endif %}
+{% endfor %}
+{% endif %}

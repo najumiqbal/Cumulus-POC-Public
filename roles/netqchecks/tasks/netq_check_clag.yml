@@ -1,0 +1,35 @@
+---
+
+- name: GATHER CLAG INFO IN JSON
+  command: netq check clag json
+  register: result
+  run_once: true
+  failed_when: "'ERROR' in result.stdout"
+
+- name: STDOUT STRING INTO JSON
+  set_fact: json_output="{{result.stdout | from_json }}"
+  run_once: true
+
+- name: OUTOUT OF CLAG "json_output" VARIABLE
+  debug: var=json_output
+  run_once: true
+
+- name: CHECK FAILED CLAG MEMBERS
+  debug: msg="Check failed clag members"
+  when: json_output["failedNodes"]|length == 0
+  run_once: true
+
+- name: CLAG MEMBERS STATUS FAILED
+  fail: msg="Device {{item['hostname']}},
+            Why node is in failed state? {{item['error']}}"
+  with_items: "{{json_output['failedNodes']}}"
+  run_once: true
+  ignore_errors: yes
+
+- name: CLAG MEMBERS STATUS WARNING
+  fail: msg="Device {{item['hostname']}},
+            Why node is in warning state? {{item['warning']}}"
+  when: json_output["warningNodes"] is defined
+  with_items: "{{json_output['warningNodes']}}"
+  run_once: true
+  ignore_errors: yes

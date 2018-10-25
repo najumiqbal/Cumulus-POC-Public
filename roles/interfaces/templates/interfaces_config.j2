@@ -2,46 +2,46 @@
 
 
 {% if loopback is defined %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! LOOPBACK CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+################################
+# LOOPBACK CONFIGURATION START #
+################################
 auto lo
 iface lo inet loopback
     address {{ loopback }}
 {% if clagd_vxlan_anycast_ip is defined %}
     clagd-vxlan-anycast-ip {{ clagd_vxlan_anycast_ip }}
 {% endif %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! LOOPBACK CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+##############################
+# LOOPBACK CONFIGURATION END #
+##############################
 {% endif %}
-!
-!
+
+
 {% if vrf is defined %}
 {% for item in vrf %}
 {% if loop.first %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VRF CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
+###########################
+# VRF CONFIGURATION START #
+###########################
 {% endif %}
 auto {{ item }}
 iface {{ item }}
     vrf-table auto
 {% if loop.last %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VRF CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#########################
+# VRF CONFIGURATION END #
+#########################
 {% endif %}
 {% endfor %}
 {% endif %}
-!
-!
+
+
 {% if interfaces is defined %}
 {% for port, value in interfaces.items() %}
 {% if loop.first %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PHYSICAL INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+##########################################
+# PHYSICAL INTERFACE CONFIGURATION START #
+##########################################
 {% endif %}
 auto {{ port }}
 iface {{ port }}
@@ -82,20 +82,20 @@ iface {{ port }}
     mstpctl-portnetwork {{ bridge_assurance }}
 {% endif %} 
 {% if loop.last %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PHYSICAL INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+########################################
+# PHYSICAL INTERFACE CONFIGURATION END #
+########################################
 {% endif %}
 {% endfor %}
 {% endif %}
-!
-!
+
+
 {% if bonds is defined %}
 {% for port, value in bonds.items() %}
 {% if loop.first %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BOND INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# BOND INTERFACE CONFIGURATION START #
+######################################
 {% endif %}
 auto {{ port }}
 iface {{ port }}
@@ -130,7 +130,7 @@ iface {{ port }}
     bond-miimon {{ value.bond_miimon }}
 {% endif %}
 {% if value and 'mstpctl_portadminedge' in value  %}
-    mstpct-portadminedge {{ value.mstpctl_portadminedge }}
+    mstpctl-portadminedge {{ value.mstpctl_portadminedge }}
 {% endif %}
 {% if value and 'mstpctl_bpduguard' in value  %}
     mstpctl-bpduguard {{ value.mstpctl_bpduguard }}
@@ -139,18 +139,18 @@ iface {{ port }}
     mstpctl-portnetwork {{ value.bridge_assurance }}
 {% endif %}
 {% if loop.last %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BOND INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+####################################
+# BOND INTERFACE CONFIGURATION END #
+####################################
 {% endif %}
 {% endfor %}
 {% endif %}
-!
-!
+
+
 {% if peerlink is defined %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PEERLINK INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+##########################################
+# PEERLINK INTERFACE CONFIGURATION START #
+##########################################
 auto peerlink
 iface peerlink
     bond-slaves {{ peerlink.bond_slaves }}
@@ -160,20 +160,20 @@ auto peerlink.{{ peerlink.vlan }}
 iface peerlink.{{ peerlink.vlan }}
     address {{ peerlink.address }}
     clagd-peer-ip {{ peerlink.clagd_peer_ip }}
-    clagd-backup-ip {{ peerlink.clagd_backup_ip }}
+    clagd-backup-ip {{ peerlink.clagd_backup_ip }} vrf mgmt
     clagd-sys-mac {{ peerlink.clagd_sys_mac }}
     clagd-enable yes
     clagd-priority {{ peerlink.clagd_priority }}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PEERLINK INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+########################################
+# PEERLINK INTERFACE CONFIGURATION END #
+########################################
 {% endif %}
-!
-!
+
+
 {% if bridge is defined %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BRIDGE INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+########################################
+# BRIDGE INTERFACE CONFIGURATION START #
+########################################
 auto bridge
 iface bridge
     bridge-vlan-aware yes
@@ -182,20 +182,19 @@ iface bridge
 {% if bridge_vlan_aware is defined %}
     bridge-vlan-aware {{ bridge_vlan_aware }}
 {% endif %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! BRIDGE INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# BRIDGE INTERFACE CONFIGURATION END #
+######################################
 {% endif %}
 
 {% if vlans is defined %}
 {% for vlan_id, value in vlans.items() %}
 {% if loop.first %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# VLAN INTERFACE CONFIGURATION START #
+######################################
 {% endif %}
-auto vlan{{ vlan_id }}
-interface vlan{{ vlan_id }}
+iface vlan{{ vlan_id }}
     alias {{ value.alias }}
 {% if value and 'vrf' in value %}
     vrf {{ value.vrf }}
@@ -205,25 +204,28 @@ interface vlan{{ vlan_id }}
 {% if value and 'vlan_raw_device' in value %}
     vlan-raw-device {{ value.vlan_raw_device }}
 {% endif %}
+{% if value and 'vrf' in value %}
+    vrf {{ value.vrf }}
+{% endif %}
     vlan-id {{ vlan_id }}
 {% if loop.last %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+######################################
+# VLAN INTERFACE CONFIGURATION START #
+######################################
 {% endif %}
 {% endfor %}
 {% endif %}
-!
-!
+
+
 {% if vxlans is defined %}
 {% for vni_id, value in vxlans.items() %}
 {% if loop.first %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VXLAN INTERFACE CONFIGURATION START !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#######################################
+# VXLAN INTERFACE CONFIGURATION START #
+#######################################
 {% endif %}
 auto vni{{ vni_id }}
-interface vni{{ vni_id }}
+iface vni{{ vni_id }}
     alias {{ value.alias }}{{ value.vxlan_id}}
     vxlan-id {{ value.vxlan_id }}
     vxlan-local-tunnelip {{ value.vxlan_local_tunnelip|replace("/32", "") }}
@@ -233,9 +235,9 @@ interface vni{{ vni_id }}
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 {% if loop.last %}
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! VXLAN INTERFACE CONFIGURATION END !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#####################################
+# VXLAN INTERFACE CONFIGURATION END #
+#####################################
 {% endif %}
 {% endfor %}
 {% endif %}
