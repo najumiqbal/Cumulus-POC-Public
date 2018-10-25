@@ -144,6 +144,7 @@ vxlans:
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10066
     l3_vni_id: 4001
+    mtu: 9000
   67:
     alias: cs-storage-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -153,6 +154,7 @@ vxlans:
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10067
     l3_vni_id: 4002
+    mtu: 9000
   68:
     alias: cs-guest-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -162,6 +164,7 @@ vxlans:
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10068
     l3_vni_id: 4003
+    mtu: 9000
   69:
     alias: cs-public-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -171,6 +174,7 @@ vxlans:
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10069
     l3_vni_id: 4004
+    mtu: 9000
   70:
     alias: cs-mgmt-l2-vni-
     vxlan_local_tunnelip: "{{ loopback }}"
@@ -180,6 +184,7 @@ vxlans:
     bridge_arp_nd_suppress: 'on'
     vxlan_id: 10070
     l3_vni_id: 4005
+    mtu: 9000
 
 interfaces:
   swp1:

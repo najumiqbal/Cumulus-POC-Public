@@ -39,14 +39,14 @@
       service: name=switchd state=restarted
 
   roles:
-    - pretest
-    - sshkeys
+#    - pretest
+#    - sshkeys
     - configbackup
-    - ptm
-    - hostname
+#    - ptm
+#    - hostname
     - interfaces
     - routing
-    - license
-    - ntp
-    - netq
-    - netqchecks
+#    - license
+#    - ntp
+#    - netq
+#    - netqchecks

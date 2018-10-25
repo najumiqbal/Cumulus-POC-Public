@@ -1,0 +1,70 @@
+## File Managed by Ansible ##
+
+############################
+# MGMT CONFIGURATION START #
+############################
+auto eth0
+iface eth0
+    address 10.76.35.2/23
+    gateway 10.76.34.1
+    vrf mgmt
+
+auto mgmt
+iface mgmt
+    address 127.0.0.1/8
+    vrf-table auto
+##########################
+# MGMT CONFIGURATION END #
+##########################
+
+################################
+# LOOPBACK CONFIGURATION START #
+################################
+auto lo
+iface lo inet loopback
+    address 10.75.65.66/32
+##############################
+# LOOPBACK CONFIGURATION END #
+##############################
+
+
+
+
+##########################################
+# PHYSICAL INTERFACE CONFIGURATION START #
+##########################################
+auto swp2
+iface swp2
+    alias link-lf-2
+    mtu 9216
+ 
+auto swp3
+iface swp3
+    alias link-lf-3
+    mtu 9216
+ 
+auto swp1
+iface swp1
+    alias link-lf-1
+    mtu 9216
+ 
+auto swp4
+iface swp4
+    alias link-lf-4
+    mtu 9216
+ 
+########################################
+# PHYSICAL INTERFACE CONFIGURATION END #
+########################################
+
+
+
+
+
+
+
+
+
+
+
+

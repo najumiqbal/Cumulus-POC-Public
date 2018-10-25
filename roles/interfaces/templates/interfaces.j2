@@ -200,6 +200,7 @@ iface bridge
 {% if bridge_vlan_aware is defined %}
     bridge-vlan-aware {{ bridge_vlan_aware }}
 {% endif %}
+    mtu 9216
 ######################################
 # BRIDGE INTERFACE CONFIGURATION END #
 ######################################
@@ -246,7 +247,6 @@ iface vlan{{ vlan_id }}
 auto vlan{{ value.l3_vni_id }}
 iface vlan{{ value.l3_vni_id }}
     alias {{ value.alias }}-l3vni-10{{ value.l3_vni_id }}
-    hwaddress {{ value.vmac }}
 {% if value and 'vlan_raw_device' in value %}
     vlan-raw-device {{ value.vlan_raw_device }}
 {% endif %}
@@ -281,7 +281,7 @@ iface vni{{ vni_id }}
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 {% if value and 'mtu' in value %}
-    mtu {{ value.mtu }}
+    mtu 9166
 {% endif %}
 {% if loop.last %}
 #####################################
@@ -309,7 +309,7 @@ iface vni{{ value.l3_vni_id }}
     mstpctl-bpduguard yes
     mstpctl-portbpdufilter yes
 {% if value and 'mtu' in value %}
-    mtu {{ value.mtu }}
+    mtu 9166
 {% endif %}
 {% if loop.last %}
 ######################################
